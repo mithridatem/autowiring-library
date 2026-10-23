@@ -20,10 +20,16 @@ L'exemple de base affiche `Bonjour, Mathieu`.
 
 ## Utiliser depuis un autre projet
 
-Le nom Composer du paquet est `mithridatem/autowiring`. Sa présence sur Packagist
-n'est pas supposée : cette PR ne publie aucune version. Après intégration sur `main`,
-on peut installer la version de développement avec un dépôt VCS dans le
-`composer.json` de l'application :
+Le nom Composer du paquet est **`mithridatem/autowiring`**. Une fois la première
+version stable publiée sur Packagist :
+
+```bash
+composer require mithridatem/autowiring:^1.0
+```
+
+Cette commande nécessite un tag stable indexé par Packagist ; la préparation du
+paquet ne suffit pas à rendre cette version disponible. Avant publication, on
+peut utiliser un dépôt VCS dans le `composer.json` de l'application :
 
 ```json
 {
@@ -37,6 +43,7 @@ on peut installer la version de développement avec un dépôt VCS dans le
 ```
 
 Puis exécuter `composer update mithridatem/autowiring`.
+
 Le cœur requiert seulement `psr/container`. Le routeur et PHPUnit sont des
 dépendances de développement de ce dépôt ; ils ne sont pas imposés aux applications.
 
@@ -210,3 +217,20 @@ sur PHP 8.1, 8.3 et 8.4.
 Les services métier reçoivent leurs dépendances dans leurs constructeurs.
 Réserver l'usage du conteneur au démarrage, aux fabriques et au resolver ; les
 repositories et services n'ont pas besoin de connaître le conteneur.
+
+## Organisation et distribution
+
+| Emplacement | Contenu | Archive de distribution |
+| --- | --- | --- |
+| `src/` | Conteneur, exceptions PSR-11, adaptateur optionnel | Inclus |
+| `composer.json`, `LICENSE`, `README.md`, `CHANGELOG.md` | Métadonnées, licence, usage et historique | Inclus |
+| `tests/`, `examples/`, `scripts/`, `phpunit.xml` | Développement, exemples et vérifications | Exclus |
+| `.github/`, `docs/` | CI et procédure de publication | Exclus |
+
+L'autoload de production expose uniquement `Mithridatem\Autowiring\` depuis
+`src/`. Les tests et les classes `Example\` appartiennent à l'autoload de
+développement. Pour exécuter les exemples ou les tests, cloner le dépôt et
+installer les dépendances de développement plutôt que travailler dans `vendor/`.
+
+La procédure complète figure dans [docs/PUBLISHING.md](https://github.com/mithridatem/autowiring-library/blob/main/docs/PUBLISHING.md).
+Les changements sont consignés dans [CHANGELOG.md](CHANGELOG.md).
