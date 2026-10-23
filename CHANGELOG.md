@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Documentation
+
+- Installation stable depuis Packagist et vérification de la version installée.
+- Guide de maintenance pour les releases suivant la première version stable.
+- Guide d'utilisation avec intégration du routeur, injection PDO et dépannage.
+
+## [1.0.0] - 2026-10-23
+
+Première version stable, disponible sur Packagist.
+
 ### Ajouts
 
 - Conteneur d'objets compatible PSR-11 avec injection par constructeur.
@@ -13,6 +23,5 @@
 - Métadonnées Composer, archives allégées et procédure de publication sur Packagist.
 - Vérification de l'installation de l'archive comme dépendance de production.
 
-La première version stable n'est pas annoncée par ce fichier. Lors de sa création,
-remplacer cette section par une entrée datée (par exemple `1.0.0`) et ouvrir une
-nouvelle section `Unreleased`.
+[Unreleased]: https://github.com/mithridatem/autowiring-library/compare/v1.0.0...main
+[1.0.0]: https://github.com/mithridatem/autowiring-library/tree/v1.0.0

@@ -6,6 +6,9 @@ avec un adaptateur optionnel pour [Mithridatem Router](https://github.com/evalua
 
 Prérequis : PHP 8.1 ou supérieur et Composer.
 
+Pour une intégration guidée (index.php, routing, repositories et PDO), consulter
+le [guide d'utilisation](https://github.com/mithridatem/autowiring-library/blob/main/docs/USAGE.md).
+
 ## Démarrer dans ce dépôt
 
 ```bash
@@ -20,29 +23,28 @@ L'exemple de base affiche `Bonjour, Mathieu`.
 
 ## Utiliser depuis un autre projet
 
-Le nom Composer du paquet est **`mithridatem/autowiring`**. Une fois la première
-version stable publiée sur Packagist :
+La version **[v1.0.0](https://github.com/mithridatem/autowiring-library/tree/v1.0.0)**
+est disponible sur [Packagist](https://packagist.org/packages/mithridatem/autowiring)
+sous le nom **`mithridatem/autowiring`**.
+
+Depuis la racine de l'application :
 
 ```bash
 composer require mithridatem/autowiring:^1.0
 ```
 
-Cette commande nécessite un tag stable indexé par Packagist ; la préparation du
-paquet ne suffit pas à rendre cette version disponible. Avant publication, on
-peut utiliser un dépôt VCS dans le `composer.json` de l'application :
+Aucun dépôt VCS personnalisé n'est nécessaire pour installer la version stable.
+Pour vérifier la version effectivement installée :
 
-```json
-{
-    "repositories": [
-        {"type": "vcs", "url": "https://github.com/mithridatem/autowiring-library"}
-    ],
-    "require": {
-        "mithridatem/autowiring": "dev-main"
-    }
-}
+```bash
+composer show mithridatem/autowiring
 ```
 
-Puis exécuter `composer update mithridatem/autowiring`.
+Pour mettre à jour une installation existante dans les limites de sa contrainte :
+
+```bash
+composer update mithridatem/autowiring
+```
 
 Le cœur requiert seulement `psr/container`. Le routeur et PHPUnit sont des
 dépendances de développement de ce dépôt ; ils ne sont pas imposés aux applications.
@@ -50,6 +52,8 @@ dépendances de développement de ce dépôt ; ils ne sont pas imposés aux appl
 ## Résolution automatique
 
 ```php
+require __DIR__ . '/vendor/autoload.php';
+
 use Mithridatem\Autowiring\Container;
 
 final class BookRepository {}
@@ -144,7 +148,13 @@ créer un conteneur par requête si des services conservent un état propre à l
 
 ## Intégration avec le routeur
 
-Installer aussi `mithridatem/router:^1.2` dans l'application. Aucun changement de la
+Installer les deux paquets dans l'application :
+
+```bash
+composer require mithridatem/autowiring:^1.0 mithridatem/router:^1.2
+```
+
+Aucun changement de la
 librairie de routing n'est nécessaire : son `ControllerResolverInterface` est le
 point d'intégration.
 
