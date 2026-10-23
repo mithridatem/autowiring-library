@@ -9,41 +9,10 @@ Prérequis : PHP 8.1 ou supérieur et Composer.
 Pour une intégration guidée (index.php, routing, repositories et PDO), consulter
 le [guide d'utilisation](https://github.com/mithridatem/autowiring-library/blob/main/docs/USAGE.md).
 
-## Démarrer dans ce dépôt
-
-```bash
-git clone https://github.com/mithridatem/autowiring-library.git
-cd autowiring-library
-composer install
-composer example
-composer test
-```
-
-L'exemple de base affiche `Bonjour, Mathieu`.
-
-## Utiliser depuis un autre projet
-
-La version **[v1.0.0](https://github.com/mithridatem/autowiring-library/tree/v1.0.0)**
-est disponible sur [Packagist](https://packagist.org/packages/mithridatem/autowiring)
-sous le nom **`mithridatem/autowiring`**.
-
-Depuis la racine de l'application :
+## Installation
 
 ```bash
 composer require mithridatem/autowiring:^1.0
-```
-
-Aucun dépôt VCS personnalisé n'est nécessaire pour installer la version stable.
-Pour vérifier la version effectivement installée :
-
-```bash
-composer show mithridatem/autowiring
-```
-
-Pour mettre à jour une installation existante dans les limites de sa contrainte :
-
-```bash
-composer update mithridatem/autowiring
 ```
 
 Le cœur requiert seulement `psr/container`. Le routeur et PHPUnit sont des
