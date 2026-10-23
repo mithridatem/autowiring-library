@@ -23,3 +23,25 @@ jobs:
       - run: composer validate --strict
       - run: composer install --no-interaction --prefer-dist
       - run: composer check
+
+  distribution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: zip
+          coverage: none
+          tools: composer:v2
+      - run: composer validate --strict
+      - name: Build distribution archive
+        run: |
+          mkdir -p .build
+          git archive --format=zip --output=.build/autowiring.zip HEAD
+      - name: Inspect archive and prepare independent consumer
+        run: php scripts/check-package.php .build/autowiring.zip
+      - name: Install as a production dependency
+        run: composer install --working-dir=.build/consumer --no-dev --no-interaction --prefer-dist --no-plugins --no-scripts
+      - name: Verify production autoload and dependency isolation
+        run: php .build/consumer/smoke.php

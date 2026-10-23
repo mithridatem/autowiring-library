@@ -3,6 +3,25 @@
     "description": "Constructor autowiring container with an optional Mithridatem Router bridge.",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "autowiring",
+        "dependency-injection",
+        "container",
+        "psr-11",
+        "routing"
+    ],
+    "homepage": "https://github.com/mithridatem/autowiring-library",
+    "support": {
+        "issues": "https://github.com/mithridatem/autowiring-library/issues",
+        "source": "https://github.com/mithridatem/autowiring-library"
+    },
+    "authors": [
+        {
+            "name": "Mathieu Mithridate",
+            "homepage": "https://github.com/mithridatem",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": "^8.1",
         "psr/container": "^2.0"
@@ -26,9 +45,13 @@
         }
     },
     "scripts": {
-        "test": "phpunit",
-        "example": "php examples/basic.php",
-        "lint": "php scripts/lint.php",
-        "check": ["@lint", "@test", "@example"]
+        "test": "@php vendor/bin/phpunit",
+        "example": "@php examples/basic.php",
+        "lint": "@php scripts/lint.php",
+        "check": [
+            "@lint",
+            "@test",
+            "@example"
+        ]
     }
 }
