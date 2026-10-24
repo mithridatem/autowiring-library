@@ -1,10 +1,11 @@
 # Attribut Inject et configuration centralisée
 
 Ces fonctionnalités sont disponibles depuis **v1.1.0**, publiée sur Packagist.
-Elles ne sont pas disponibles dans le tag 1.0.0. Pour les installer :
+Elles restent compatibles avec 1.2.0, qui ajoute la découverte. Pour installer
+la version 1.2 :
 
 ```bash
-composer require mithridatem/autowiring:^1.1
+composer require mithridatem/autowiring:^1.2
 ```
 
 L'injection classique par type continue à fonctionner sans attribut. Les classes
@@ -183,7 +184,7 @@ L'exemple `examples/attributes.php` et sa configuration
 | `Do not resolve services while loading configuration` | Déplacer l'appel à `get()` dans une fabrique. |
 | `Circular configuration import` | Retirer l'import qui recharge un fichier déjà en cours de chargement. |
 
-La [découverte optionnelle](DISCOVERY.md) est prévue pour la version suivante ;
-elle peut compléter ces fichiers de configuration.
+Depuis 1.2.0, la [découverte optionnelle](DISCOVERY.md) peut compléter ces fichiers
+de configuration et associer automatiquement les interfaces à une implémentation unique.
 
 Voir également le [guide général](USAGE.md) et le [README](../README.md).

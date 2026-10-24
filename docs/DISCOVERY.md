@@ -1,9 +1,11 @@
 # Découverte optionnelle des implémentations
 
-Cette fonctionnalité est prévue pour la prochaine version mineure **1.2.0**.
-Elle n'est pas disponible dans v1.1.0. Pour la tester avant publication, utiliser
-la branche de la PR ou le code de `main` après fusion. La commande d'installation
-après publication sera `composer require mithridatem/autowiring:^1.2`.
+La découverte est introduite dans la version **1.2.0**. Elle complète les attributs
+et le chargement de configuration disponibles depuis 1.1.0. Installation :
+
+```bash
+composer require mithridatem/autowiring:^1.2
+```
 
 ## À quoi sert la découverte ?
 

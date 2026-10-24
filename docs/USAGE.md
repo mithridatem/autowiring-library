@@ -6,15 +6,15 @@ Il suppose PHP 8.1 ou supérieur, Composer et un point d'entrée `public/index.p
 Depuis v1.1.0, le [guide attributs et configuration](ATTRIBUTES-AND-CONFIGURATION.md)
 présente `#[Inject]` et le chargement de `config/services.php`. Ces ajouts sont
 optionnels ; les exemples ci-dessous restent utilisables avec la version 1.0.0.
-La [découverte des implémentations](DISCOVERY.md) sera disponible dans la prochaine
-version mineure (1.2.0).
+Depuis 1.2.0, la [découverte des implémentations](DISCOVERY.md) peut également
+réduire les associations manuelles. Les exemples ci-dessous restent valables sans découverte.
 
 ## 1. Installer et charger la librairie
 
 Depuis la racine de l'application :
 
 ```bash
-composer require mithridatem/autowiring:^1.0
+composer require mithridatem/autowiring:^1.2
 ```
 
 Configurer l'autoload de **l'application**, en conservant ses autres réglages

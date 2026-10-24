@@ -17,7 +17,7 @@ pour les exemples, l'ordre de priorité et le dépannage.
 ## Installation
 
 ```bash
-composer require mithridatem/autowiring:^1.1
+composer require mithridatem/autowiring:^1.2
 ```
 
 Le cœur requiert seulement `psr/container`. Le routeur et PHPUnit sont des
@@ -54,10 +54,9 @@ $container->bind(BookRepositoryInterface::class, SqlBookRepository::class);
 L'implémentation doit être une classe instanciable respectant le contrat demandé.
 Une classe parente peut également être associée à une sous-classe.
 
-## Découverte optionnelle des implémentations (prochaine version 1.2)
+## Découverte optionnelle des implémentations (depuis 1.2.0)
 
-Cette API est ajoutée sur `main` pour la prochaine version mineure ; elle n'est
-pas présente dans v1.1.0. Dans un fichier `config/services.php` :
+La version 1.2.0 ajoute cette API optionnelle. Dans `config/services.php` :
 
 ```php
 return static function (\Mithridatem\Autowiring\Container $container): void {
@@ -147,7 +146,7 @@ créer un conteneur par requête si des services conservent un état propre à l
 Installer les deux paquets dans l'application :
 
 ```bash
-composer require mithridatem/autowiring:^1.1 mithridatem/router:^1.2
+composer require mithridatem/autowiring:^1.2 mithridatem/router:^1.2
 ```
 
 Aucun changement de la
@@ -190,8 +189,8 @@ Les déclarations `mapController()` continuent également à fonctionner.
 
 L'exemple `examples/routing/` contient un contrôleur avec `#[Route]`, un service,
 une interface de repository et un repository en mémoire, sans base de données.
-Sur `main`, cet exemple utilise `discover()` dans sa configuration et nécessite
-le code de la prochaine version 1.2. Depuis la racine du dépôt après `composer install` :
+Cet exemple utilise `discover()` dans sa configuration et nécessite la version
+1.2.0 ou supérieure. Depuis la racine du dépôt après `composer install` :
 
 ```bash
 php -S 127.0.0.1:8080 -t examples/routing/public examples/routing/public/index.php

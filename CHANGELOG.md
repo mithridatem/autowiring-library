@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+Aucun changement supplémentaire annoncé.
+
+## [1.2.0] - 2026-10-24
+
 ### Ajouts
 
 - Découverte optionnelle des implémentations via un répertoire et un namespace PSR-4.
@@ -11,9 +15,9 @@
 
 ### Documentation
 
-- Actualisation des guides pour la version 1.1.0 publiée sur Packagist.
+- Actualisation des guides et des commandes Composer pour la release 1.2.0.
 
-La découverte est destinée à une prochaine version mineure (1.2.0).
+La découverte est introduite dans cette version ; les fonctionnalités 1.1 restent compatibles.
 
 ## [1.1.0] - 2026-10-24
 
@@ -56,7 +60,8 @@ Première version stable, disponible sur Packagist.
 - Métadonnées Composer, archives allégées et procédure de publication sur Packagist.
 - Vérification de l'installation de l'archive comme dépendance de production.
 
-[Unreleased]: https://github.com/mithridatem/autowiring-library/compare/v1.1.0...main
+[Unreleased]: https://github.com/mithridatem/autowiring-library/compare/v1.2.0...main
+[1.2.0]: https://github.com/mithridatem/autowiring-library/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/mithridatem/autowiring-library/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/mithridatem/autowiring-library/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/mithridatem/autowiring-library/compare/v1.0.0...v1.0.1

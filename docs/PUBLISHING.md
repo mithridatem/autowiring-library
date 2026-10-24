@@ -1,12 +1,18 @@
 # Maintenir et publier Mithridatem Autowiring
 
-## Version publiée
+## Version 1.2.0
 
-La version **v1.1.0**, datée du **24 octobre 2026**, est disponible
-sur [Packagist](https://packagist.org/packages/mithridatem/autowiring).
-Son code source est consultable sur le [tag v1.1.0](https://github.com/mithridatem/autowiring-library/tree/v1.1.0).
-Le dépôt est déjà enregistré sur Packagist et son webhook GitHub est configuré.
-Il n'est pas nécessaire de soumettre de nouveau le dépôt pour les prochaines versions.
+La version **1.2.0** introduit la découverte optionnelle des implémentations.
+Les attributs et `load()` de 1.1.0 continuent de fonctionner.
+
+Cette documentation accompagne la release `v1.2.0`. Fusionner la PR de mise à jour
+avant de créer le tag, afin que le paquet distribué contienne également le README,
+le changelog et les guides à jour. La date du changelog doit correspondre à la
+date effective de publication.
+
+Le dépôt est déjà enregistré sur [Packagist](https://packagist.org/packages/mithridatem/autowiring)
+et son webhook GitHub est configuré. Ne pas soumettre de nouveau le dépôt.
+Après le push du tag, vérifier que `v1.2.0` apparaît sur la page du paquet.
 
 Le paquet porte le nom Composer `mithridatem/autowiring`. Le nom du dépôt GitHub
 `autowiring-library` peut être différent : le champ `name` de `composer.json`
@@ -14,10 +20,10 @@ détermine la commande d'installation.
 
 ## Installer et vérifier la version stable
 
-Depuis un projet d'application :
+Depuis un projet d'application, après publication :
 
 ```bash
-composer require mithridatem/autowiring:^1.1
+composer require mithridatem/autowiring:^1.2
 composer show mithridatem/autowiring
 ```
 
@@ -35,7 +41,7 @@ cloner le dépôt et installer les dépendances de développement pour les exéc
 
 1. Consigner les évolutions dans la section `Unreleased` de `CHANGELOG.md`.
 2. Choisir une version selon les changements : correctif compatible (par exemple
-   `1.1.1`), fonctionnalité compatible (`1.2.0`) ou rupture de l'API (`2.0.0`).
+   `1.2.1`), fonctionnalité compatible (`1.3.0`) ou rupture de l'API (`2.0.0`).
 3. Avant la release, transformer les éléments concernés de `Unreleased` en une
    section datée portant la version choisie et conserver une section `Unreleased`
    pour la suite. Mettre à jour les liens de comparaison en bas du changelog.
@@ -66,8 +72,7 @@ git push origin v1.2.0
 Ne pas recréer ou déplacer un tag publié, notamment `v1.0.0` ou `v1.1.0`. Les mises à jour de documentation sur `main`
 ne modifient pas le contenu déjà distribué sous ce tag. Pour distribuer ces
 changements avec le paquet, les inclure dans une prochaine release.
-La découverte ajoutée sur `main` est destinée à une future version **1.2.0** ;
-elle ne fait pas partie du tag 1.1.0.
+La découverte appartient à **1.2.0** et n'est pas présente dans le tag 1.1.0.
 Ne pas ajouter de champ `version` dans `composer.json` : Composer déduit les
 versions des tags Git.
 
