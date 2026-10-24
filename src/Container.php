@@ -6,6 +6,7 @@ namespace Mithridatem\Autowiring;
 
 use Closure;
 use Mithridatem\Autowiring\Attribute\Inject;
+use Mithridatem\Autowiring\Discovery\ServiceDiscovery;
 use Mithridatem\Autowiring\Exception\ContainerException;
 use Mithridatem\Autowiring\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
@@ -32,6 +33,26 @@ final class Container implements ContainerInterface
     private bool $locked = false;
     /** @var array<string, true> Configuration files currently being loaded. */
     private array $loadingFiles = [];
+    /** @var array<class-string, list<class-string>> */
+    private array $discovered = [];
+
+    /** Register implementations from an explicit PSR-4 directory/namespace pair. */
+    public function discover(string $directory, string $namespace): self
+    {
+        $this->assertConfigurable($directory);
+        try {
+            $candidates = (new ServiceDiscovery())->discover($directory, $namespace);
+        } catch (Throwable $error) {
+            throw new ContainerException("Cannot discover services in $directory: " . $error->getMessage(), 0, $error);
+        }
+        foreach ($candidates as $interface => $classes) {
+            $merged = array_values(array_unique([...($this->discovered[$interface] ?? []), ...$classes]));
+            sort($merged, SORT_STRING);
+            $this->discovered[$interface] = $merged;
+        }
+
+        return $this;
+    }
 
     /** Load a trusted PHP file returning a Closure(Container): void. */
     public function load(string $file): self
@@ -45,7 +66,7 @@ final class Container implements ContainerInterface
             throw new ContainerException("Circular configuration import: $path");
         }
 
-        $snapshot = [$this->bindings, $this->factories, $this->values, $this->parameters];
+        $snapshot = [$this->bindings, $this->factories, $this->values, $this->parameters, $this->discovered];
         $this->loadingFiles[$path] = true;
         try {
             $configure = (static fn (string $path) => require $path)($path);
@@ -54,7 +75,7 @@ final class Container implements ContainerInterface
             }
             $configure($this);
         } catch (Throwable $error) {
-            [$this->bindings, $this->factories, $this->values, $this->parameters] = $snapshot;
+            [$this->bindings, $this->factories, $this->values, $this->parameters, $this->discovered] = $snapshot;
             throw new ContainerException("Cannot load configuration $path: " . $error->getMessage(), 0, $error);
         } finally {
             unset($this->loadingFiles[$path]);
@@ -130,6 +151,7 @@ final class Container implements ContainerInterface
             || isset($this->bindings[$id])
             || isset($this->factories[$id])
             || isset($this->values[$id])
+            || isset($this->discovered[$id])
             || (class_exists($id) && (new ReflectionClass($id))->isInstantiable());
     }
 
@@ -158,6 +180,12 @@ final class Container implements ContainerInterface
                 $instance = $this->values[$id];
             } elseif (isset($this->factories[$id])) {
                 $instance = ($this->factories[$id])($this);
+            } elseif (isset($this->discovered[$id])) {
+                $classes = $this->discovered[$id];
+                if (count($classes) !== 1) {
+                    throw new ContainerException("Ambiguous implementations for $id: " . implode(', ', $classes) . '. Use bind(), set(), factory() or Inject to select a service.');
+                }
+                $instance = $this->get($classes[0]);
             } else {
                 $instance = $this->build($id);
             }

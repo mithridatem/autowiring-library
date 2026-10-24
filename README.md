@@ -9,16 +9,15 @@ Prérequis : PHP 8.1 ou supérieur et Composer.
 Pour une intégration guidée (index.php, routing, repositories et PDO), consulter
 le [guide d'utilisation](https://github.com/mithridatem/autowiring-library/blob/main/docs/USAGE.md).
 
-La prochaine version mineure ajoute `#[Inject]` sur les paramètres de constructeur
-et `Container::load()` pour centraliser les définitions dans `config/services.php`.
-Ces ajouts ne sont pas inclus dans v1.0.0. Consulter le
+Depuis **v1.1.0**, `#[Inject]` sélectionne un service dans un constructeur et
+`Container::load()` centralise les définitions dans `config/services.php`. Consulter le
 [guide attributs et configuration](https://github.com/mithridatem/autowiring-library/blob/main/docs/ATTRIBUTES-AND-CONFIGURATION.md)
 pour les exemples, l'ordre de priorité et le dépannage.
 
 ## Installation
 
 ```bash
-composer require mithridatem/autowiring:^1.0
+composer require mithridatem/autowiring:^1.1
 ```
 
 Le cœur requiert seulement `psr/container`. Le routeur et PHPUnit sont des
@@ -54,6 +53,25 @@ $container->bind(BookRepositoryInterface::class, SqlBookRepository::class);
 
 L'implémentation doit être une classe instanciable respectant le contrat demandé.
 Une classe parente peut également être associée à une sous-classe.
+
+## Découverte optionnelle des implémentations (prochaine version 1.2)
+
+Cette API est ajoutée sur `main` pour la prochaine version mineure ; elle n'est
+pas présente dans v1.1.0. Dans un fichier `config/services.php` :
+
+```php
+return static function (\Mithridatem\Autowiring\Container $container): void {
+    $container->discover(dirname(__DIR__) . '/src/Repository', 'App\\Repository');
+};
+```
+
+Le namespace doit correspondre à l'autoload PSR-4 du répertoire. Une interface
+avec une seule implémentation découverte est associée automatiquement, sans
+instanciation pendant le parcours. En cas d'ambiguïté, la résolution indique les
+classes candidates et demande un choix explicite. `bind()`, `set()` et `factory()`
+restent prioritaires, quel que soit leur ordre par rapport à `discover()`.
+Voir le [guide de découverte](https://github.com/mithridatem/autowiring-library/blob/main/docs/DISCOVERY.md)
+pour les limites, la résolution des ambiguïtés et les exemples.
 
 ## Fournir des paramètres comme `$path`
 
@@ -103,8 +121,8 @@ Les classes internes PHP, comme PDO, doivent être fournies par `set()` ou `fact
   conteneur. Une interface associée et sa classe concrète retournent le même objet.
   Deux définitions de fabrique distinctes restent deux services distincts.
 - Une valeur explicitement configurée est prioritaire. Ensuite, un paramètre de
-  constructeur peut sélectionner un service avec `#[Inject]` dans la prochaine
-  version mineure (identifiant objet et type vérifiés). Sans attribut, le comportement
+  constructeur peut sélectionner un service avec `#[Inject]` depuis v1.1.0
+  (identifiant objet et type vérifiés). Sans attribut, le comportement
   reste inchangé : un paramètre de
   type objet résoluble est injecté. À défaut, la valeur par défaut du paramètre
   est utilisée si elle existe. Sinon une exception explique le paramètre manquant.
@@ -129,7 +147,7 @@ créer un conteneur par requête si des services conservent un état propre à l
 Installer les deux paquets dans l'application :
 
 ```bash
-composer require mithridatem/autowiring:^1.0 mithridatem/router:^1.2
+composer require mithridatem/autowiring:^1.1 mithridatem/router:^1.2
 ```
 
 Aucun changement de la
@@ -172,7 +190,8 @@ Les déclarations `mapController()` continuent également à fonctionner.
 
 L'exemple `examples/routing/` contient un contrôleur avec `#[Route]`, un service,
 une interface de repository et un repository en mémoire, sans base de données.
-Depuis la racine du dépôt après `composer install` :
+Sur `main`, cet exemple utilise `discover()` dans sa configuration et nécessite
+le code de la prochaine version 1.2. Depuis la racine du dépôt après `composer install` :
 
 ```bash
 php -S 127.0.0.1:8080 -t examples/routing/public examples/routing/public/index.php

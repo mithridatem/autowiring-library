@@ -1,8 +1,7 @@
 # Attribut Inject et configuration centralisée
 
-Ces fonctionnalités sont prévues pour la prochaine version mineure (1.1.0).
-Elles ne sont pas disponibles dans le tag 1.0.0. En attendant la publication,
-utiliser la branche de la PR pour les tester. Après publication, la commande sera :
+Ces fonctionnalités sont disponibles depuis **v1.1.0**, publiée sur Packagist.
+Elles ne sont pas disponibles dans le tag 1.0.0. Pour les installer :
 
 ```bash
 composer require mithridatem/autowiring:^1.1
@@ -164,7 +163,7 @@ l'attribut. Les services conservent leur cycle de vie partagé dans le conteneur
 
 ## Exemple fourni et dépannage
 
-Depuis un clone de la branche contenant cette évolution :
+Depuis un clone du dépôt (v1.1.0 ou supérieure) :
 
 ```bash
 composer install
@@ -183,5 +182,8 @@ L'exemple `examples/attributes.php` et sa configuration
 | `Configuration must return a Closure` | Retourner `static function (Container $container): void { ... }`. |
 | `Do not resolve services while loading configuration` | Déplacer l'appel à `get()` dans une fabrique. |
 | `Circular configuration import` | Retirer l'import qui recharge un fichier déjà en cours de chargement. |
+
+La [découverte optionnelle](DISCOVERY.md) est prévue pour la version suivante ;
+elle peut compléter ces fichiers de configuration.
 
 Voir également le [guide général](USAGE.md) et le [README](../README.md).

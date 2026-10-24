@@ -14,7 +14,7 @@ if ($zip->open($archivePath) !== true) {
     throw new RuntimeException('Cannot open package archive.');
 }
 
-$required = ['composer.json', 'LICENSE', 'README.md', 'CHANGELOG.md', 'src/Container.php', 'src/Attribute/Inject.php',
+$required = ['composer.json', 'LICENSE', 'README.md', 'CHANGELOG.md', 'src/Container.php', 'src/Attribute/Inject.php', 'src/Discovery/ServiceDiscovery.php',
     'src/Exception/ContainerException.php', 'src/Exception/NotFoundException.php',
     'src/Bridge/Routing/ContainerControllerResolver.php'];
 foreach ($required as $path) {
@@ -69,13 +69,28 @@ final class SelectedService
 {
     public function __construct(#[Inject('dependency.selected')] public Dependency $dependency) {}
 }
+interface SmokeContract {}
+
+// Exercise discovery with only production dependencies and the distributed code.
+$directory = __DIR__ . '/discovered';
+if (!is_dir($directory)) {
+    mkdir($directory);
+}
+file_put_contents($directory . '/Store.php', '<?php namespace SmokeDiscovery; final class Store implements \\SmokeContract {}');
+spl_autoload_register(static function (string $class) use ($directory): void {
+    if ($class === 'SmokeDiscovery\\Store') {
+        require $directory . '/Store.php';
+    }
+});
 
 $container = new Container();
 $selected = new Dependency();
 $container->set('dependency.selected', $selected);
+$container->discover($directory, 'SmokeDiscovery');
 if (!$container instanceof ContainerInterface
     || !$container->get(Service::class)->dependency instanceof Dependency
-    || $container->get(SelectedService::class)->dependency !== $selected) {
+    || $container->get(SelectedService::class)->dependency !== $selected
+    || !$container->get(SmokeContract::class) instanceof \SmokeDiscovery\Store) {
     throw new RuntimeException('Production autoload or autowiring failed.');
 }
 foreach (['PHPUnit\Framework\TestCase', 'Example\Controller\BookController',

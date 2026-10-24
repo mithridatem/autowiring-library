@@ -2,9 +2,9 @@
 
 ## Version publiée
 
-La première version stable **v1.0.0**, datée du **23 octobre 2026**, est disponible
+La version **v1.1.0**, datée du **24 octobre 2026**, est disponible
 sur [Packagist](https://packagist.org/packages/mithridatem/autowiring).
-Son code source est consultable sur le [tag v1.0.0](https://github.com/mithridatem/autowiring-library/tree/v1.0.0).
+Son code source est consultable sur le [tag v1.1.0](https://github.com/mithridatem/autowiring-library/tree/v1.1.0).
 Le dépôt est déjà enregistré sur Packagist et son webhook GitHub est configuré.
 Il n'est pas nécessaire de soumettre de nouveau le dépôt pour les prochaines versions.
 
@@ -17,7 +17,7 @@ détermine la commande d'installation.
 Depuis un projet d'application :
 
 ```bash
-composer require mithridatem/autowiring:^1.0
+composer require mithridatem/autowiring:^1.1
 composer show mithridatem/autowiring
 ```
 
@@ -35,7 +35,7 @@ cloner le dépôt et installer les dépendances de développement pour les exéc
 
 1. Consigner les évolutions dans la section `Unreleased` de `CHANGELOG.md`.
 2. Choisir une version selon les changements : correctif compatible (par exemple
-   `1.0.1`), fonctionnalité compatible (`1.1.0`) ou rupture de l'API (`2.0.0`).
+   `1.1.1`), fonctionnalité compatible (`1.2.0`) ou rupture de l'API (`2.0.0`).
 3. Avant la release, transformer les éléments concernés de `Unreleased` en une
    section datée portant la version choisie et conserver une section `Unreleased`
    pour la suite. Mettre à jour les liens de comparaison en bas du changelog.
@@ -55,17 +55,19 @@ Attendre la réussite de la CI et vérifier que le répertoire de travail est pr
 La CI vérifie les tests sur PHP 8.1, 8.3 et 8.4 et l'installation de l'archive dans
 une application indépendante sans dépendances de développement.
 
-Créer ensuite le nouveau tag. Exemple pour une **future** version corrective,
-uniquement si `v1.0.1` est bien la version choisie et n'existe pas encore :
+Créer ensuite le nouveau tag. Exemple pour la prochaine version mineure qui
+contient la découverte, après fusion et validation, si `v1.2.0` n'existe pas encore :
 
 ```bash
-git tag -a v1.0.1 -m "Release v1.0.1"
-git push origin v1.0.1
+git tag -a v1.2.0 -m "Release v1.2.0"
+git push origin v1.2.0
 ```
 
-Ne pas recréer ou déplacer `v1.0.0`. Les mises à jour de documentation sur `main`
+Ne pas recréer ou déplacer un tag publié, notamment `v1.0.0` ou `v1.1.0`. Les mises à jour de documentation sur `main`
 ne modifient pas le contenu déjà distribué sous ce tag. Pour distribuer ces
 changements avec le paquet, les inclure dans une prochaine release.
+La découverte ajoutée sur `main` est destinée à une future version **1.2.0** ;
+elle ne fait pas partie du tag 1.1.0.
 Ne pas ajouter de champ `version` dans `composer.json` : Composer déduit les
 versions des tags Git.
 
