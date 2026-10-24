@@ -12,7 +12,7 @@ classe de connexion MySQL appartiennent à votre application.
 Depuis la racine du projet :
 
 ```bash
-composer require mithridatem/autowiring:^1.2 mithridatem/router:^1.2
+composer require mithridatem/autowiring:^1.2 mithridatem/router:^1.3
 ```
 
 Le projet doit utiliser PHP 8.1 ou supérieur. Pour MySQL, activer `pdo_mysql`.
