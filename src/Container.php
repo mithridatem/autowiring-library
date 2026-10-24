@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mithridatem\Autowiring;
 
 use Closure;
+use Mithridatem\Autowiring\Attribute\Inject;
 use Mithridatem\Autowiring\Exception\ContainerException;
 use Mithridatem\Autowiring\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
@@ -29,6 +30,38 @@ final class Container implements ContainerInterface
     /** @var array<string, true> */
     private array $resolving = [];
     private bool $locked = false;
+    /** @var array<string, true> Configuration files currently being loaded. */
+    private array $loadingFiles = [];
+
+    /** Load a trusted PHP file returning a Closure(Container): void. */
+    public function load(string $file): self
+    {
+        $this->assertConfigurable($file);
+        $path = realpath($file);
+        if ($path === false || !is_file($path) || !is_readable($path)) {
+            throw new ContainerException("Configuration file is not readable: $file");
+        }
+        if (isset($this->loadingFiles[$path])) {
+            throw new ContainerException("Circular configuration import: $path");
+        }
+
+        $snapshot = [$this->bindings, $this->factories, $this->values, $this->parameters];
+        $this->loadingFiles[$path] = true;
+        try {
+            $configure = (static fn (string $path) => require $path)($path);
+            if (!$configure instanceof Closure) {
+                throw new ContainerException('Configuration must return a Closure accepting the container.');
+            }
+            $configure($this);
+        } catch (Throwable $error) {
+            [$this->bindings, $this->factories, $this->values, $this->parameters] = $snapshot;
+            throw new ContainerException("Cannot load configuration $path: " . $error->getMessage(), 0, $error);
+        } finally {
+            unset($this->loadingFiles[$path]);
+        }
+
+        return $this;
+    }
 
     /** Bind an interface or parent class to an instantiable implementation. */
     public function bind(string $id, string $implementation): self
@@ -102,6 +135,9 @@ final class Container implements ContainerInterface
 
     public function get(string $id): object
     {
+        if ($this->loadingFiles !== []) {
+            throw new ContainerException('Do not resolve services while loading configuration; register factories instead.');
+        }
         // Avoid stale object graphs: all definitions are configured before resolution.
         $this->locked = true;
         if (isset($this->instances[$id])) {
@@ -158,14 +194,27 @@ final class Container implements ContainerInterface
             }
 
             $type = $parameter->getType();
+            $attributes = $parameter->getAttributes(Inject::class);
+            if ($attributes !== []) {
+                $location = $class . '::$' . $parameter->getName();
+                if (count($attributes) !== 1) {
+                    throw new ContainerException("Only one Inject attribute is allowed: $location");
+                }
+                if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
+                    throw new ContainerException("Inject requires a named object type: $location. Use configure() for values.");
+                }
+                $id = $attributes[0]->newInstance()->id;
+                $instance = $this->get($id);
+                $expected = $this->parameterClass($parameter, $type);
+                if (!$instance instanceof $expected) {
+                    throw new ContainerException("Service '$id' must implement or extend $expected for $location");
+                }
+                $arguments[] = $instance;
+                continue;
+            }
+
             if ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
-                $name = $type->getName();
-                $declaringClass = $parameter->getDeclaringClass();
-                $name = match ($name) {
-                    'self' => $declaringClass->getName(),
-                    'parent' => $declaringClass->getParentClass()->getName(),
-                    default => $name,
-                };
+                $name = $this->parameterClass($parameter, $type);
                 if ($this->has($name)) {
                     $arguments[] = $this->get($name);
                     continue;
@@ -181,6 +230,15 @@ final class Container implements ContainerInterface
         }
 
         return $reflection->newInstanceArgs($arguments);
+    }
+
+    private function parameterClass(ReflectionParameter $parameter, ReflectionNamedType $type): string
+    {
+        return match ($type->getName()) {
+            'self' => $parameter->getDeclaringClass()->getName(),
+            'parent' => $parameter->getDeclaringClass()->getParentClass()->getName(),
+            default => $type->getName(),
+        };
     }
 
     private function assertConfigurable(string $id): void

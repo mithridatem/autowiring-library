@@ -14,7 +14,7 @@ if ($zip->open($archivePath) !== true) {
     throw new RuntimeException('Cannot open package archive.');
 }
 
-$required = ['composer.json', 'LICENSE', 'README.md', 'CHANGELOG.md', 'src/Container.php',
+$required = ['composer.json', 'LICENSE', 'README.md', 'CHANGELOG.md', 'src/Container.php', 'src/Attribute/Inject.php',
     'src/Exception/ContainerException.php', 'src/Exception/NotFoundException.php',
     'src/Bridge/Routing/ContainerControllerResolver.php'];
 foreach ($required as $path) {
@@ -57,6 +57,7 @@ declare(strict_types=1);
 require __DIR__ . '/vendor/autoload.php';
 
 use Mithridatem\Autowiring\Container;
+use Mithridatem\Autowiring\Attribute\Inject;
 use Psr\Container\ContainerInterface;
 
 final class Dependency {}
@@ -64,10 +65,17 @@ final class Service
 {
     public function __construct(public Dependency $dependency) {}
 }
+final class SelectedService
+{
+    public function __construct(#[Inject('dependency.selected')] public Dependency $dependency) {}
+}
 
 $container = new Container();
+$selected = new Dependency();
+$container->set('dependency.selected', $selected);
 if (!$container instanceof ContainerInterface
-    || !$container->get(Service::class)->dependency instanceof Dependency) {
+    || !$container->get(Service::class)->dependency instanceof Dependency
+    || $container->get(SelectedService::class)->dependency !== $selected) {
     throw new RuntimeException('Production autoload or autowiring failed.');
 }
 foreach (['PHPUnit\Framework\TestCase', 'Example\Controller\BookController',
