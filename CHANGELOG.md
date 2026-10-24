@@ -2,7 +2,10 @@
 
 ## [Unreleased]
 
-Aucun changement supplémentaire annoncé.
+### Documentation
+
+- Démarrage rapide avec les fichiers `config/service.php` et `public/index.php`,
+  la connexion PDO et les prérequis applicatifs, accessible depuis le README.
 
 ## [1.2.0] - 2026-10-24
 

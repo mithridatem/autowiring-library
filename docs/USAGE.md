@@ -1,5 +1,9 @@
 # Guide d'utilisation de Mithridatem Autowiring
 
+Pour une première intégration, commencer par le [démarrage rapide](QUICKSTART.md) :
+il regroupe les exemples complets de `config/service.php` et `public/index.php`.
+Cette page sert ensuite de référence pour approfondir la configuration.
+
 Ce guide accompagne l'intégration de la version 1.x dans une application PHP.
 Il suppose PHP 8.1 ou supérieur, Composer et un point d'entrée `public/index.php`.
 
