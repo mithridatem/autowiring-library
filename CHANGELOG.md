@@ -2,11 +2,23 @@
 
 ## [Unreleased]
 
+### Ajouts
+
+- Attribut `#[Inject]` pour sélectionner un service objet dans un constructeur,
+  avec priorité à `configure()` et vérification du type attendu.
+- Chargement de fichiers `config/services.php` retournant une Closure de configuration.
+- Détection des imports circulaires et restauration des définitions si un chargement échoue.
+- Exemple exécutable, tests unitaires, intégration au routeur et contrôle de l'archive.
+
+Ces fonctionnalités sont destinées à une prochaine version mineure ; le tag
+1.0.0 publié reste inchangé.
+
 ### Documentation
 
 - Installation stable depuis Packagist et vérification de la version installée.
 - Guide de maintenance pour les releases suivant la première version stable.
 - Guide d'utilisation avec intégration du routeur, injection PDO et dépannage.
+- Guide des attributs, du chargement de configuration et de leurs limites.
 
 ## [1.0.0] - 2026-10-23
 

@@ -9,6 +9,12 @@ Prérequis : PHP 8.1 ou supérieur et Composer.
 Pour une intégration guidée (index.php, routing, repositories et PDO), consulter
 le [guide d'utilisation](https://github.com/mithridatem/autowiring-library/blob/main/docs/USAGE.md).
 
+La prochaine version mineure ajoute `#[Inject]` sur les paramètres de constructeur
+et `Container::load()` pour centraliser les définitions dans `config/services.php`.
+Ces ajouts ne sont pas inclus dans v1.0.0. Consulter le
+[guide attributs et configuration](https://github.com/mithridatem/autowiring-library/blob/main/docs/ATTRIBUTES-AND-CONFIGURATION.md)
+pour les exemples, l'ordre de priorité et le dépannage.
+
 ## Installation
 
 ```bash
@@ -97,6 +103,9 @@ Les classes internes PHP, comme PDO, doivent être fournies par `set()` ou `fact
   conteneur. Une interface associée et sa classe concrète retournent le même objet.
   Deux définitions de fabrique distinctes restent deux services distincts.
 - Une valeur explicitement configurée est prioritaire. Ensuite, un paramètre de
+  constructeur peut sélectionner un service avec `#[Inject]` dans la prochaine
+  version mineure (identifiant objet et type vérifiés). Sans attribut, le comportement
+  reste inchangé : un paramètre de
   type objet résoluble est injecté. À défaut, la valeur par défaut du paramètre
   est utilisée si elle existe. Sinon une exception explique le paramètre manquant.
 - Un paramètre nullable sans valeur par défaut reste obligatoire. Un objet

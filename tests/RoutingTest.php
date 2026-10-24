@@ -6,6 +6,7 @@ namespace Mithridatem\Autowiring\Tests;
 
 use Mithridatem\Autowiring\Bridge\Routing\ContainerControllerResolver;
 use Mithridatem\Autowiring\Container;
+use Mithridatem\Autowiring\Attribute\Inject;
 use Mithridatem\Routing\Attribute\Route;
 use Mithridatem\Routing\Context\NativeRequestContext;
 use Mithridatem\Routing\Exception\RouterException;
@@ -17,6 +18,16 @@ use Psr\Container\ContainerInterface;
 
 final class RoutingTest extends TestCase
 {
+    public function testAttributeSelectedServiceIsUsedDuringDispatch(): void
+    {
+        $container = (new Container())
+            ->set('routing.service', new RoutingService())
+            ->factory(RoutingService::class, fn () => throw new \RuntimeException('Default must not be used'));
+        $router = new Router(controllerResolver: new ContainerControllerResolver($container));
+        (new AttributeRouteLoader())->loadController($router, InjectRoutingController::class);
+        self::assertSame('Book #42', $router->dispatch(new NativeRequestContext('/selected/42', 'GET')));
+    }
+
     public function testAttributeRoutesInjectConstructorServicesAndKeepUrlParameters(): void
     {
         $container = new Container();
@@ -95,4 +106,12 @@ final class RoutingController
     public function show(string $id): string { return $this->service->title($id); }
 
     private function hidden(): string { return 'hidden'; }
+}
+
+final class InjectRoutingController
+{
+    public function __construct(#[Inject('routing.service')] private RoutingService $service) {}
+
+    #[Route(path: '/selected/{id}', method: 'GET')]
+    public function show(string $id): string { return $this->service->title($id); }
 }

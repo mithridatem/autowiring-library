@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
 
-use Example\Repository\BookRepositoryInterface;
-use Example\Repository\InMemoryBookRepository;
 use Mithridatem\Autowiring\Bridge\Routing\ContainerControllerResolver;
 use Mithridatem\Autowiring\Container;
 use Mithridatem\Routing\Loader\AttributeRouteLoader;
 use Mithridatem\Routing\Router;
 
-$container = (new Container())->bind(BookRepositoryInterface::class, InMemoryBookRepository::class);
+$container = (new Container())->load(__DIR__ . '/config/services.php');
 $router = new Router(controllerResolver: new ContainerControllerResolver($container));
 
 (new AttributeRouteLoader())->loadDirectory(

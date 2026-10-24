@@ -3,6 +3,11 @@
 Ce guide accompagne l'intégration de la version 1.x dans une application PHP.
 Il suppose PHP 8.1 ou supérieur, Composer et un point d'entrée `public/index.php`.
 
+Pour la prochaine version mineure, le [guide attributs et configuration](ATTRIBUTES-AND-CONFIGURATION.md)
+présente `#[Inject]` et le chargement de `config/services.php`. Ces ajouts sont
+optionnels et ne sont pas encore disponibles dans le tag 1.0.0 ; les exemples
+ci-dessous restent utilisables avec la version 1.0.0.
+
 ## 1. Installer et charger la librairie
 
 Depuis la racine de l'application :
