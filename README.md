@@ -6,8 +6,11 @@ avec un adaptateur optionnel pour [Mithridatem Router](https://github.com/evalua
 
 Prérequis : PHP 8.1 ou supérieur et Composer.
 
-Pour une intégration guidée (index.php, routing, repositories et PDO), consulter
-le [guide d'utilisation](https://github.com/mithridatem/autowiring-library/blob/main/docs/USAGE.md).
+**Première intégration ?** Commencer par le
+[démarrage rapide : config/service.php et public/index.php](https://github.com/mithridatem/autowiring-library/blob/main/docs/QUICKSTART.md).
+Il présente les deux fichiers à adapter, la connexion PDO et les vérifications de base.
+Le [guide d'utilisation](https://github.com/mithridatem/autowiring-library/blob/main/docs/USAGE.md)
+détaille ensuite les options et le dépannage.
 
 Depuis **v1.1.0**, `#[Inject]` sélectionne un service dans un constructeur et
 `Container::load()` centralise les définitions dans `config/services.php`. Consulter le
