@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Mithridatem\Autowiring;
 
 use Closure;
-use Mithridatem\Autowiring\Attribute\Inject;
+use Mithridatem\Autowiring\Construction\ConstructorArgumentResolver;
+use Mithridatem\Autowiring\Construction\ObjectBuilder;
 use Mithridatem\Autowiring\Discovery\ServiceDiscovery;
 use Mithridatem\Autowiring\Exception\ContainerException;
 use Mithridatem\Autowiring\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
-use ReflectionNamedType;
 use ReflectionParameter;
 use Throwable;
 
@@ -187,7 +187,7 @@ final class Container implements ContainerInterface
                 }
                 $instance = $this->get($classes[0]);
             } else {
-                $instance = $this->build($id);
+                $instance = (new ObjectBuilder(new ConstructorArgumentResolver($this)))->build($id, $this->parameters[$id] ?? []);
             }
 
             if (!is_object($instance)) {
@@ -202,71 +202,6 @@ final class Container implements ContainerInterface
         } finally {
             unset($this->resolving[$id]);
         }
-    }
-
-    private function build(string $class): object
-    {
-        $reflection = new ReflectionClass($class);
-        if ($reflection->isInternal()) {
-            throw new ContainerException("Register a factory or instance for internal class: $class");
-        }
-        $arguments = [];
-        foreach ($reflection->getConstructor()?->getParameters() ?? [] as $parameter) {
-            if ($parameter->isPassedByReference() || $parameter->isVariadic()) {
-                throw new ContainerException("Use a factory for reference/variadic parameter: $class::\$" . $parameter->getName());
-            }
-            $configured = $this->parameters[$class] ?? [];
-            if (array_key_exists($parameter->getName(), $configured)) {
-                $arguments[] = $configured[$parameter->getName()];
-                continue;
-            }
-
-            $type = $parameter->getType();
-            $attributes = $parameter->getAttributes(Inject::class);
-            if ($attributes !== []) {
-                $location = $class . '::$' . $parameter->getName();
-                if (count($attributes) !== 1) {
-                    throw new ContainerException("Only one Inject attribute is allowed: $location");
-                }
-                if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
-                    throw new ContainerException("Inject requires a named object type: $location. Use configure() for values.");
-                }
-                $id = $attributes[0]->newInstance()->id;
-                $instance = $this->get($id);
-                $expected = $this->parameterClass($parameter, $type);
-                if (!$instance instanceof $expected) {
-                    throw new ContainerException("Service '$id' must implement or extend $expected for $location");
-                }
-                $arguments[] = $instance;
-                continue;
-            }
-
-            if ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
-                $name = $this->parameterClass($parameter, $type);
-                if ($this->has($name)) {
-                    $arguments[] = $this->get($name);
-                    continue;
-                }
-            }
-
-            if ($parameter->isDefaultValueAvailable()) {
-                $arguments[] = $parameter->getDefaultValue();
-                continue;
-            }
-
-            throw new ContainerException("Unresolvable parameter: $class::\$" . $parameter->getName() . '. Use bind(), configure() or factory().');
-        }
-
-        return $reflection->newInstanceArgs($arguments);
-    }
-
-    private function parameterClass(ReflectionParameter $parameter, ReflectionNamedType $type): string
-    {
-        return match ($type->getName()) {
-            'self' => $parameter->getDeclaringClass()->getName(),
-            'parent' => $parameter->getDeclaringClass()->getParentClass()->getName(),
-            default => $type->getName(),
-        };
     }
 
     private function assertConfigurable(string $id): void
