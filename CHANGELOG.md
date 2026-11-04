@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Ajouts
+
+- Contrat optionnel `FactoryInterface` pour les factories objets réutilisables.
+- `FactoryRegistry` pour isoler les définitions de factories du conteneur.
+- Compatibilité intégrale de `factory($id, callable)` et des règles de résolution.
+- Tests des factories avancées et guide dédié avec exemple Symfony HttpClient.
+
 ### Documentation
 
 - Démarrage rapide avec les fichiers `config/service.php` et `public/index.php`,
