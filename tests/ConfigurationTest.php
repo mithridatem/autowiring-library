@@ -96,6 +96,28 @@ PHP);
         self::assertSame($original, $container->get('value'));
     }
 
+
+    public function testFailedLoadRestoresFactoryRegistryDefinitions(): void
+    {
+        $original = new \stdClass();
+        $container = (new Container())->factory('existing', static fn (): object => $original);
+        $path = $this->file(<<<'PHP'
+return static function ($c): void {
+    $c->factory('existing', new \Mithridatem\Autowiring\Tests\ConfigurationFactory());
+    $c->factory('partial', static fn (): object => new stdClass());
+    throw new RuntimeException('configuration failure');
+};
+PHP);
+        try {
+            $container->load($path);
+            self::fail('Expected configuration error');
+        } catch (ContainerException $error) {
+            self::assertInstanceOf(RuntimeException::class, $error->getPrevious());
+        }
+        self::assertFalse($container->has('partial'));
+        self::assertSame($original, $container->get('existing'));
+    }
+
     public function testParseErrorIsWrappedAndLoadingStateIsCleaned(): void
     {
         $container = new Container();
@@ -149,4 +171,12 @@ interface ConfigInterface {}
 final class ConfigValue implements ConfigInterface
 {
     public function __construct(public string $path) {}
+}
+
+final class ConfigurationFactory implements \Mithridatem\Autowiring\Factory\FactoryInterface
+{
+    public function create(\Psr\Container\ContainerInterface $container): object
+    {
+        return new \stdClass();
+    }
 }
