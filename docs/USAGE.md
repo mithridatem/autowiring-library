@@ -255,4 +255,7 @@ Ce partage est local au conteneur, pas global à toute l'application.
 
 Pour vérifier l'installation : `composer show mithridatem/autowiring`.
 Pour les versions et la publication : [PUBLISHING.md](PUBLISHING.md).
+Pour utiliser des factories objets réutilisables et un client HTTP externe :
+[guide des factories](FACTORIES.md).
+
 Pour l'API et ses limites : [README](../README.md).
