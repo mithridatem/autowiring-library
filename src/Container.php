@@ -10,6 +10,8 @@ use Mithridatem\Autowiring\Construction\ObjectBuilder;
 use Mithridatem\Autowiring\Discovery\ServiceDiscovery;
 use Mithridatem\Autowiring\Exception\ContainerException;
 use Mithridatem\Autowiring\Exception\NotFoundException;
+use Mithridatem\Autowiring\Factory\FactoryInterface;
+use Mithridatem\Autowiring\Factory\FactoryRegistry;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionParameter;
@@ -20,8 +22,7 @@ final class Container implements ContainerInterface
 {
     /** @var array<string, string> */
     private array $bindings = [];
-    /** @var array<string, Closure> */
-    private array $factories = [];
+    private FactoryRegistry $factories;
     /** @var array<string, object> */
     private array $values = [];
     /** @var array<class-string, array<string, mixed>> */
@@ -35,6 +36,11 @@ final class Container implements ContainerInterface
     private array $loadingFiles = [];
     /** @var array<class-string, list<class-string>> */
     private array $discovered = [];
+
+    public function __construct()
+    {
+        $this->factories = new FactoryRegistry();
+    }
 
     /** Register implementations from an explicit PSR-4 directory/namespace pair. */
     public function discover(string $directory, string $namespace): self
@@ -66,7 +72,7 @@ final class Container implements ContainerInterface
             throw new ContainerException("Circular configuration import: $path");
         }
 
-        $snapshot = [$this->bindings, $this->factories, $this->values, $this->parameters, $this->discovered];
+        $snapshot = [$this->bindings, $this->factories->snapshot(), $this->values, $this->parameters, $this->discovered];
         $this->loadingFiles[$path] = true;
         try {
             $configure = (static fn (string $path) => require $path)($path);
@@ -75,7 +81,8 @@ final class Container implements ContainerInterface
             }
             $configure($this);
         } catch (Throwable $error) {
-            [$this->bindings, $this->factories, $this->values, $this->parameters, $this->discovered] = $snapshot;
+            [$this->bindings, $factories, $this->values, $this->parameters, $this->discovered] = $snapshot;
+            $this->factories->restore($factories);
             throw new ContainerException("Cannot load configuration $path: " . $error->getMessage(), 0, $error);
         } finally {
             unset($this->loadingFiles[$path]);
@@ -96,7 +103,8 @@ final class Container implements ContainerInterface
             throw new ContainerException("Invalid binding: $id -> $implementation");
         }
 
-        unset($this->factories[$id], $this->values[$id]);
+        $this->factories->remove($id);
+        unset($this->values[$id]);
         $this->bindings[$id] = $implementation;
 
         return $this;
@@ -107,18 +115,19 @@ final class Container implements ContainerInterface
     {
         $this->assertConfigurable($id);
         $this->assertServiceType($id, $instance);
-        unset($this->bindings[$id], $this->factories[$id]);
+        unset($this->bindings[$id]);
+        $this->factories->remove($id);
         $this->values[$id] = $instance;
 
         return $this;
     }
 
-    /** The factory receives this container; it must return an object. */
-    public function factory(string $id, callable $factory): self
+    /** Register a legacy callable or an explicit reusable factory object. */
+    public function factory(string $id, callable|FactoryInterface $factory): self
     {
         $this->assertConfigurable($id);
         unset($this->bindings[$id], $this->values[$id]);
-        $this->factories[$id] = Closure::fromCallable($factory);
+        $this->factories->register($id, $factory);
 
         return $this;
     }
@@ -149,7 +158,7 @@ final class Container implements ContainerInterface
     {
         return isset($this->instances[$id])
             || isset($this->bindings[$id])
-            || isset($this->factories[$id])
+            || $this->factories->has($id)
             || isset($this->values[$id])
             || isset($this->discovered[$id])
             || (class_exists($id) && (new ReflectionClass($id))->isInstantiable());
@@ -178,8 +187,11 @@ final class Container implements ContainerInterface
                 $instance = $this->get($this->bindings[$id]);
             } elseif (isset($this->values[$id])) {
                 $instance = $this->values[$id];
-            } elseif (isset($this->factories[$id])) {
-                $instance = ($this->factories[$id])($this);
+            } elseif ($this->factories->has($id)) {
+                $factory = $this->factories->get($id);
+                $instance = $factory instanceof FactoryInterface
+                    ? $factory->create($this)
+                    : $factory($this);
             } elseif (isset($this->discovered[$id])) {
                 $classes = $this->discovered[$id];
                 if (count($classes) !== 1) {
