@@ -114,6 +114,29 @@ retourne un objet. Pour un identifiant de classe ou d'interface, le résultat do
 respecter ce type. On peut aussi utiliser un identifiant libre comme `logger.file`.
 Les classes internes PHP, comme PDO, doivent être fournies par `set()` ou `factory()`.
 
+Une **factory avancée** peut implémenter `Mithridatem\\Autowiring\\Factory\\FactoryInterface` :
+
+```php
+use Mithridatem\\Autowiring\\Factory\\FactoryInterface;
+use Psr\\Container\\ContainerInterface;
+
+final class ConnectionFactory implements FactoryInterface
+{
+    public function create(ContainerInterface $container): object
+    {
+        return new PDO('sqlite::memory:');
+    }
+}
+
+$container->factory(PDO::class, new ConnectionFactory());
+```
+
+La syntaxe `factory($id, callable)` reste intégralement compatible. Les factories
+sont exécutées à la demande, leurs résultats sont validés puis partagés par le
+conteneur. Les factories objets sont enregistrées explicitement et ne sont pas
+découvertes automatiquement. Voir [le guide des factories](docs/FACTORIES.md).
+
+
 ## Cycle de vie et règles de résolution
 
 - Effectuer tous les `bind()`, `set()`, `factory()` et `configure()` **avant le premier
