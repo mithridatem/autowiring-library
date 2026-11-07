@@ -54,11 +54,10 @@ final class DiscoveryRoutingSecurityTest extends TestCase
         $router->mapController('GET', '/items/{id}', GuardedController::class, 'show');
 
         // An arbitrary class-looking string remains a handler argument only.
-        self::assertSame('item:Untrusted\\Service', $router->dispatch(
-            new NativeRequestContext('/items/Untrusted%5CService', 'GET')
-        ) === 'item:Untrusted%5CService'
-            ? 'item:Untrusted\\Service'
-            : 'unexpected');
+        self::assertSame(
+            'item:Untrusted%5CService',
+            $router->dispatch(new NativeRequestContext('/items/Untrusted%5CService', 'GET'))
+        );
     }
 
     public function testDiscoveryAutoloadsCandidateButDoesNotConstructIt(): void
