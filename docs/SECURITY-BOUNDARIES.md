@@ -78,3 +78,40 @@ responsabilité partagée avec le chargeur Composer.
 **Politique du projet :** pas de changement d'API ou de code de production
 sans preuve d'une vulnérabilité structurelle dans un scénario d'utilisation
 conforme à la documentation.
+
+
+## Factories et `#[Inject]` — tests adversariaux complémentaires
+
+Les scénarios du fichier `tests/Security/FactoryInjectSecurityTest.php`
+caractérisent les frontières suivantes :
+
+- Une factory enregistrée sous un nom de classe ou d'interface doit retourner
+  un objet compatible avec ce type. Un résultat incorrect est rejeté et non
+  mémorisé ; un appel suivant peut retenter la factory.
+- Une factory implémentant `FactoryInterface` reçoit un conteneur PSR-11.
+  Son résultat est partagé dans ce conteneur après une résolution réussie.
+- Avant le premier `get()`, `set()` peut remplacer une factory. La factory
+  remplacée ne doit jamais être appelée lors de la résolution.
+- Les dépendances cycliques entre factories sont rejetées ; une erreur ne
+  doit pas empêcher la résolution ultérieure de services indépendants.
+- `#[Inject('service.selected')]` exige le service explicitement désigné :
+  aucune bascule silencieuse vers une autre implémentation n'est prévue
+  lorsque sa factory échoue.
+- Même pour un identifiant libre (sans classe PHP correspondante), l'objet
+  obtenu par `#[Inject]` doit respecter le type du paramètre de constructeur.
+- `configure()` est prioritaire sur `#[Inject]`. Si une valeur configurée
+  est incompatible avec le type PHP du constructeur, celui-ci échoue ;
+  l'attribut ne constitue pas un chemin de secours.
+
+### Responsabilités de l'application
+
+Les closures et objets factories sont **du code applicatif de confiance**.
+Le conteneur ne peut ni neutraliser leurs effets de bord, ni limiter leur
+accès aux ressources, ni annuler une opération externe après une exception.
+Les factories qui ouvrent des connexions, écrivent des fichiers ou appellent
+des API doivent traiter les erreurs et la validation de leurs propres données.
+
+Les identifiants `#[Inject]` sont déclarés dans le code du constructeur ;
+ils ne doivent pas être dérivés indirectement d'une entrée HTTP non validée
+dans la configuration des factories. Cette note décrit un contrat, pas
+une vulnérabilité intrinsèque démontrée.
